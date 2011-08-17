@@ -153,6 +153,11 @@ Please make sure you have pulled and pushed all code before deploying:
             puts get_from_tag(stage) + " --> " + get_to_tag(stage)
           end
 
+          desc "Print compare link (github)"
+          task :compare_link do
+            print github_compare_link(get_from_tag(stage), get_to_tag(stage))
+          end
+
           desc "Mark the current code as a staging/qa release"
           task :tag_staging do
             current_sha = `git log --pretty=format:%H HEAD -1`
