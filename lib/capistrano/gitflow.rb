@@ -75,7 +75,7 @@ module Capistrano
           end
 
           def get_to_tag(stage_name)
-            puts "Calculating 'end' tag for :commit_log for '#{stage}'"
+            STDERR.puts "Calculating 'end' tag for :commit_log for '#{stage}'"
             case stage_name
             when :production
               last_staging_tag
