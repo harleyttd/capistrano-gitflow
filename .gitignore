@@ -1,2 +1,6 @@
 rdoc
 pkg
+*~
+*.swp
+*.swo
+*.gem
