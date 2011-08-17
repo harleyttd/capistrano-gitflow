@@ -80,7 +80,7 @@ module Capistrano
             when :production
               last_staging_tag
             when :staging
-              'master'
+              `git rev-list master | head -n 1`.chomp
             else
               raise "Unsupported stage #{stage}"
             end
