@@ -150,12 +150,16 @@ Please make sure you have pulled and pushed all code before deploying:
 
           desc "Show from_tag and to_tag for custom commands"
           task :from_to_tags do
-            puts get_from_tag(stage) + " --> " + get_to_tag(stage)
+            s = get_from_tag(stage) + " --> " + get_to_tag(stage)
+            puts s
+            s
           end
 
           desc "Print compare link (github)"
           task :compare_link do
-            print github_compare_link(get_from_tag(stage), get_to_tag(stage))
+            s = github_compare_link(get_from_tag(stage), get_to_tag(stage))
+            puts s
+            s
           end
 
           desc "Mark the current code as a staging/qa release"
