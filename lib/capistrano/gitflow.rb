@@ -82,7 +82,7 @@ module Capistrano
             when :staging
               'master'
             else
-              raise "Unsupported state #{stage}"
+              raise "Unsupported stage #{stage}"
             end
           end
 

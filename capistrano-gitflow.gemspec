@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   ]
   s.files            = `git ls-files`.split("\n")
   s.test_files       = `git ls-files -- spec/*`.split("\n")
-  s.homepage         = "http://github.com/harleyttd/#{s.name}"
+  s.homepage         = "http://github.com/harleyttd/capistrano-gitflow"
   s.require_paths    = ["lib"]
   s.rubygems_version = %q{1.3.7}
   
