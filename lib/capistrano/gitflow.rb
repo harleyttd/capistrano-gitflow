@@ -43,8 +43,24 @@ module Capistrano
             fetch(:scm, :git).to_sym == :git
           end
 
+          def parse_github_repo_info
+            if `git config remote.origin.url` =~ /git@github.com:(.*)\/(.*).git/
+              @repo_owner, @repo_name = $1, $2
+            end
+          end
+
+          def repo_owner
+            parse_github_repo_info unless defined?(@repo_owner)
+            @repo_owner 
+          end
+
+          def repo_name
+            parse_github_repo_info unless defined?(@repo_name)
+            @repo_name
+          end
+
           def github_compare_link(from_tag, to_tag)
-            "https://github.com/#{$1}/#{$2}/compare/#{from_tag}...#{to_tag}"
+            "https://github.com/#{repo_owner}/#{repo_name}/compare/#{from_tag}...#{to_tag}"
           end
 
           def get_from_tag(stage_name)
