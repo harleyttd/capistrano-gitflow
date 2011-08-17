@@ -13,8 +13,7 @@ module Capistrano
           def last_tag_matching(pattern)
             # search for most recent (chronologically) tag matching the passed pattern, then get the name of that tag.
             last_tag = `git describe --exact-match --match '#{pattern}' \`git log --tags='#{pattern}*' --format="%H" -1\``.chomp
-            return nil if last_tag == ''
-            return last_tag
+            last_tag.presence
           end
 
           def last_staging_tag()
@@ -42,6 +41,33 @@ module Capistrano
 
           def using_git?
             fetch(:scm, :git).to_sym == :git
+          end
+
+          def github_compare_link(from_tag, to_tag)
+            "https://github.com/#{$1}/#{$2}/compare/#{from_tag}...#{to_tag}"
+          end
+
+          def get_from_tag(stage_name)
+            case stage_name
+            when :production
+               last_production_tag
+            when :staging
+               last_staging_tag
+            else
+              raise "Unsupported stage #{stage}"
+            end
+          end
+
+          def get_to_tag(stage_name)
+            puts "Calculating 'end' tag for :commit_log for '#{stage}'"
+            case stage_name
+            when :production
+              last_staging_tag
+            when :staging
+              'master'
+            else
+              raise "Unsupported state #{stage}"
+            end
           end
 
           task :verify_up_to_date do
@@ -85,42 +111,30 @@ Please make sure you have pulled and pushed all code before deploying:
 
           desc "Show log between most recent staging tag (or given tag=XXX) and last production release."
           task :commit_log do
-            from_tag = if stage == :production
-                         last_production_tag
-                       elsif stage == :staging
-                         last_staging_tag
-                       else
-                         abort "Unsupported stage #{stage}"
-                       end
+            from_tag = get_from_tag(stage)
 
             # no idea how to properly test for an optional cap argument a la '-s tag=x'
-            to_tag = capistrano_configuration[:tag]
-            to_tag ||= begin 
-                         puts "Calculating 'end' tag for :commit_log for '#{stage}'"
-                         to_tag = if stage == :production
-                                    last_staging_tag
-                                  elsif stage == :staging
-                                    'master'
-                                  else
-                                    abort "Unsupported stage #{stage}"
-                                  end
-                       end
-
+            to_tag = capistrano_configuration[:tag] || get_to_tag(stage)
 
             # use custom compare command if set
-            if ENV['git_log_command'] && ENV['git_log_command'].strip != ''
+            if ENV['git_log_command'].present?
                 command = "git #{ENV['git_log_command']} #{from_tag}..#{to_tag}"
             else
                 # default compare command
                 # be awesome for github
                 if `git config remote.origin.url` =~ /git@github.com:(.*)\/(.*).git/
-                    command = "open https://github.com/#{$1}/#{$2}/compare/#{from_tag}...#{to_tag}"
+                    command = "open #{github_compare_link from_tag, to_tag}"
                 else
                     command = "git log #{from_tag}..#{to_tag}"
                 end
             end
             puts "Displaying commits from #{from_tag} to #{to_tag} via:\n#{command}"
             system command
+          end
+
+          desc "Show from_tag and to_tag for custom commands"
+          task :from_to_tags do
+            puts get_from_tag(stage) + " --> " + get_to_tag(stage)
           end
 
           desc "Mark the current code as a staging/qa release"
