@@ -1,5 +1,4 @@
 require 'capistrano'
-require File.join(File.dirname(__FILE__), 'gitflow', 'natcmp')
 require 'stringex'
 
 module Capistrano
