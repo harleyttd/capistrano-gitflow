@@ -65,7 +65,7 @@ module Capistrano
           def get_from_tag(stage_name)
             case stage_name
             when :production
-               last_production_tag
+               last_production_tag || 'undefined'
             when :staging
                last_staging_tag
             else
@@ -79,6 +79,7 @@ module Capistrano
             when :production
               last_staging_tag
             when :staging
+              # get SHA of master
               `git rev-list master | head -n 1`.chomp
             else
               raise "Unsupported stage #{stage}"
